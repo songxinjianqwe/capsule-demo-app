@@ -1,6 +1,10 @@
 # Capsule-Demo-App
 使用Docker+Link以及Kubernetes部署一个Spring Boot + MySQL + Redis的应用集群
-## Docker+Link
+后续会考虑自己实现一个容器运行时capsule；
+并且会考虑实现Kubernetes的CRI(Container Runtime Interface)接口；
+此后会基于capsule来部署我们这个demo应用。
+
+## 以Docker+Link的方式部署
 ### MySQL
 1. docker pull mysql
 1. docker run --name=mysql -e MYSQL_ROOT_PASSWORD=$ROOT_PASSWORD -p 3306:3306 -d mysql
@@ -41,5 +45,5 @@ docker run -d -p 8080:8080 -e "SPRING_PROFILES_ACTIVE=prod" --link mysql:mysql-c
 ```
 这里使用CMD来传入profile，指定为prod。<br />根据SpringBoot规范，我们会在src/main/resources下创建一个application-prod.yml/properties配置文件来指定profile为prod的特定配置，在这个配置文件中，我们会连接redis、mysql的url从localhost改为-link时候alias（冒号后的）。<br />--link默认是基于DNS实现的，在启动Spring Boot容器时，会将容器IP与容器别名放到/etc/hosts，这样我们只需要把连接的IP改为别名即可。
 
-## 基于Kubernetes
+## 以Kubernetes的方式部署
 
