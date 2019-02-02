@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capsule-demo-app-deployment
+  labels:
+    app: capsule-demo-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: capsule-demo-app
+  template:
+    metadata:
+      labels:
+        app: capsule-demo-app
+    spec:
+      containers:
+        - name: capsule-demo-app
+          image: xinjian/capsule-demo-app:1.0
+          ports:
+            - containerPort: 8080
