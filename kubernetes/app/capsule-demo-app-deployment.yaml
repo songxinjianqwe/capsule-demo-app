@@ -14,11 +14,18 @@ spec:
     spec:
       containers:
         - name: capsule-demo-app
-          image: xinjian/capsule-demo-app:1.0
+          image: capsule/capsule-demo-app:1.0
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           env:
             - name: MYSQL_HOST
-              value: 'mysql-deployment'
+              # 使用环境变量+DNS的方式来访问redis、mysql等其他service暴露的服务
+              # 这里环境变量的格式就是service-name.namespace.svc.cluster.local
+              # 当redis、mysql暴露为服务后，会注册到DNS中，之后可以使用DNS的方式来访问服务
+              # nslookup domain可以测试是否正确注册DNS
+              value: mysql-service.default.svc.cluster.local
             - name: REDIS_HOST
-              value: 'redis-deployment'
+              value: redis-service.default.svc.cluster.local
+            - name: SPRING_PROFILES_ACTIVE
+              value: 'prodk8s'
