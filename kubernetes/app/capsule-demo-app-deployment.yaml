@@ -19,6 +19,6 @@ spec:
             - containerPort: 8080
           env:
             - name: MYSQL_HOST
-              value: 'mysql-container'
+              value: 'mysql-deployment'
             - name: REDIS_HOST
-              value: 'redis-container'
+              value: 'redis-deployment'
