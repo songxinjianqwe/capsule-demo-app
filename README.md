@@ -1,4 +1,22 @@
 # 使用Docker/Kubernetes部署一个MySQL+Redis+SpringBoot应用
+
+demo代码仓库：[https://github.com/songxinjianqwe/capsule-demo-app](https://github.com/songxinjianqwe/capsule-demo-app)
+# 项目
+该项目跑了一个简单的用户添加、查询的示例。
+* GET /users
+  * 返回所有用户
+* GET /users/{userId}
+  * 返回该用户信息，优先从Redis缓存中获取，没有命中则从DB拿
+* POST /users   
+  * body
+```json
+{
+  "id": "tom",
+  "nickName": "tom"
+}
+```
+  * 创建一个用户，然后放到Redis缓存中，并落库
+# 
 # 基于原生Docker+Link
 ## MySQL
 1. docker pull mysql
@@ -16,7 +34,7 @@ docker run --name=mysql<br />-v /host/mysql/conf:/etc/mysql/conf.d<br />-v /host
 ```powershell
 docker run --name=mysql -v /Users/jasper/Dev/data/mysql/data:/var/lib/mysql -v /Users/jasper/Dev/data/mysql/logs:/logs -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql
 ```
-挂载了数据卷后，即使销毁容器，数据库里的数据也不会丢失，只要指定一个固定的宿主机目录即可（如果-v /var/lib/mysql也是可以挂载的，但是宿主机目录不是固定的，而是随机的，下次再次启动后不方便找到该目录重新挂载）
+挂载了数据卷后，即使销毁容器，数据库里的数据也不会丢失，只要指定一个固定的宿主机目录即可（如果-v /var/lib/mysql也是可以挂载的，但是宿主机目录不是固定的，而是随机的，下次再次启动后不方便找到该目录重新挂载）<br />注意，首次创建容器后，需要创建一个名为demo的databse（不需要手动建表，由JPA来自动建表）。之后重启容器后不需要重复此步骤，因为volume可以持久化数据。
 
 ## Redis
 docker pull redis<br />docker run -d -p 6379:6379 redis
@@ -243,3 +261,22 @@ spring:
     password:
 ```
 
+当Deployment启动OK后，暴露为服务：
+
+```yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: capsule-demo-app-service
+spec:
+  type: NodePort
+  selector:
+    app: capsule-demo-app
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 32141
+```
+
+启动后，可以通过``minikube service capsule-demo-app --url``来拿到地址，也可以通过'kubectl cluster-info'拿到集群IP，然后端口号为NodePort（32141），这样就可以在宿主机上进行访问了服务。
