@@ -2,21 +2,16 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql-deployment
-  labels:
-    name: mysql
 spec:
   replicas: 1
   selector:
-    name: mysql
+    matchLabels:
+      app: mysql
   template:
     metadata:
       labels:
-        name: mysql
+        app: mysql
     spec:
-      volumns:
-        - name: mysql-storage
-          hostPath:
-            path: /Users/jasper/Dev/data/mysql/data
       containers:
         - name: mysql
           image: mysql
@@ -26,6 +21,10 @@ spec:
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "123456"
-          volumnMounts:
+          volumeMounts:
             - name: mysql-storage
               mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-storage
+          hostPath:
+            path: /Users/jasper/Dev/data/mysql/data

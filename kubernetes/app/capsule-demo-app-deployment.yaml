@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: capsule-demo-app-deployment
-  labels:
-    app: capsule-demo-app
 spec:
   replicas: 3
   selector:
@@ -19,3 +17,8 @@ spec:
           image: xinjian/capsule-demo-app:1.0
           ports:
             - containerPort: 8080
+          env:
+            - name: MYSQL_HOST
+              value: 'mysql-container'
+            - name: REDIS_HOST
+              value: 'redis-container'
